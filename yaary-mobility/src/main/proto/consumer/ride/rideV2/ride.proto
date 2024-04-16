@@ -1,0 +1,287 @@
+syntax = "proto3";
+
+package consumer.ride.rideV2;
+
+option go_package = "github.com/TriffyDigital/yaari-protos/consumer/ride/rideV2";
+
+import "consumer/common/commonV2/common.proto";
+
+service RideService {
+  rpc GetCityInfo(GetCityInfoRequest) returns (GetCityInfoResponse) {}
+  rpc InitiateSearch(GetRideQuotesRequest) returns (SubmitRideQuoteResponse) {}
+  rpc GetQuoteCatalogStream(QuoteCatalogRequest) returns (stream QuoteCatalogResponse) {}
+  rpc SelectQuote(SelectQuoteRequest) returns (SelectQuoteResponse) {}
+  rpc GetRideConfirmationStream(GetRideConfirmationRequest) returns (stream GetRideConfirmationResponse) {}
+  rpc SoftCancel(SoftCancelRequest) returns (SoftCancelRespone) {}
+  rpc ConfirmCancel(ConfirmCancelRequest) returns (ConfirmCancelRespone) {}
+  rpc RideUpdateStream(RideUpdateRequest) returns (stream RideUpdateResponse) {}
+}
+
+message GetRideQuotesRequest {
+  LatLng start = 1;
+  LatLng end = 2;
+  string start_addr_line = 3;
+  string end_addr_line = 4;
+  optional string city = 5;
+  VehicleType vehicle_type = 6;
+}
+
+message SubmitRideQuoteResponseData {
+  string transaction_id = 1;
+}
+
+message SubmitRideQuoteResponse {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  SubmitRideQuoteResponseData data = 2;
+}
+
+message SelectQuoteRequest {
+  string transaction_id = 1;
+  string provider_id = 2;
+  string item_id = 3;
+}
+
+message SelectQuoteResponseData {
+  string transaction_id = 1;
+}
+
+message SelectQuoteResponse {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  SelectQuoteResponseData data = 2;
+}
+
+message GetRideConfirmationRequest {
+  string transaction_id = 1;
+}
+
+message GetCityInfoRequest {
+  LatLng city_coordinates = 1;
+}
+
+message GetCityInfoResponseData {
+  bool is_serviceable = 1;
+  string name = 2;
+}
+
+message GetCityInfoResponse {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  GetCityInfoResponseData data = 2;
+}
+
+message LatLng {
+  double lat = 1;
+  double lng = 2;
+}
+
+message RideUpdateRequest {
+  string transaction_id = 1;
+}
+
+message RideUpdateResponseData {
+  string transaction_id = 1;
+  RideStatus ride_status = 2;
+  UpdatedOrderDetails updated_order_details = 3;
+  TrackDetails track_details = 4;
+}
+
+message RideUpdateResponse {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  RideUpdateResponseData data = 2;
+}
+
+message UpdatedOrderDetails {
+  Fare updated_fare = 1;
+  RouteInfo updated_route_info = 2;
+}
+
+message TrackDetails {
+  LatLng current_location = 1;
+  float duration = 2;
+  string poly_line = 3;
+  float distance = 4;
+}
+
+message ConfirmedRideDriverDetails {
+  string driver_name = 1;
+  string driver_phone_number = 2;
+  string rating = 3;
+}
+
+message RouteDetails {
+  float distance = 1;
+  float duration = 2;
+  string poly_line = 3;
+}
+
+message RideQuoteCatalog {
+  string transaction_id = 1;
+  Catalog catalog = 2;
+}
+
+message Catalog {
+  repeated Provider providers = 1;
+}
+
+message Provider {
+  string id = 1;
+  string logo_url = 2;
+  int64 valid_till = 3;
+  repeated Item items = 4;
+}
+
+message Item {
+  string id = 1;
+  VehicleType vehicle_type = 2;
+  VehicleSubType vehicle_sub_type = 3;
+  FareRange fare_range = 4;
+  RouteInfo route_info = 5;
+}
+
+message FareRange {
+  double min = 1;
+  double max = 2;
+  Currency currency = 3;
+}
+
+message DriverDetails {
+  string name = 1;
+  string phone_number = 2;
+  string rating = 3;
+}
+
+message VehicleDetails {
+  string manufacturer = 1;
+  string model = 2;
+  VehicleType vehicle_type = 3;
+  VehicleSubType vehicle_sub_type = 4;
+  string registration_number = 5;
+}
+
+message LocationInfo {
+  string lat = 1;
+  string lng = 2;
+  string address_line = 3;
+}
+
+message GetRideConfirmationResponseData {
+  string otp = 1;
+  DriverDetails driver_details = 2;
+  VehicleDetails vehicle_details = 3;
+  LocationInfo source = 4;
+  LocationInfo destination = 5;
+  Quote quote = 6;
+}
+
+message GetRideConfirmationResponse {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  GetRideConfirmationResponseData data = 2;
+}
+
+message SoftCancelRequest {
+  string transaction_id = 1;
+  string other_reason_msg = 2;
+  CancellationReason cancellation_reason = 3;
+}
+
+message SoftCancelResponeData {
+  string transaction_id = 1;
+  Fare cancellation_fee = 2;
+}
+
+message SoftCancelRespone {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  SoftCancelResponeData data = 2;
+}
+
+message ConfirmCancelRequest {
+  string transaction_id = 1;
+  string other_reason_msg = 2;
+  CancellationReason cancellation_reason = 3;
+}
+
+message ConfirmCancelResponeData {
+  string transaction_id = 1;
+}
+
+message ConfirmCancelRespone {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  ConfirmCancelResponeData data = 2;
+}
+
+enum CancellationReason {
+  OTHERS = 0;
+  DRIVER_NOT_MOVING= 1;
+  DRIVER_ASKED_TO_CANCEL_RIDE = 2;
+  INCORRECT_PICKUP_LOCATION = 3;
+  UNABLE_TO_CONTACT_DRIVER = 4;
+}
+
+enum Currency {
+  INR = 0;
+}
+
+enum VehicleType {
+  UNSPECIFIED = 0;
+  ANY = 1;
+  METRO = 2;
+  AUTO_RICKSHAW = 3;
+  CAB = 4;
+  BUS = 5;
+  AIRLINE = 6;
+  TWO_WHEELER = 7;
+}
+
+enum VehicleSubType {
+  AUTO = 0;
+  BIKE = 1;
+  HATCHBACK = 2;
+  SEDAN = 3;
+  SUV = 4;
+}
+
+enum RideStatus {
+  RIDE_STATUS_UNSPECIFIED = 0;
+  RIDE_STATUS_DRIVER_EN_ROUTE = 1;
+  RIDE_STATUS_RIDE_CANCELLED = 2;
+  RIDE_STATUS_PAYMENT_COLLECTED = 3;
+  RIDE_STATUS_RIDE_ENDED = 4;
+  RIDE_STATUS_DRIVER_AT_PICKUP = 5;
+  RIDE_STATUS_RIDE_STARTED = 6;
+  RIDE_STATUS_RIDE_UPDATED = 7;
+  RIDE_STATUS_RIDE_ASSIGNED = 8;
+  RIDE_STATUS_DRIVER_CANCELLED = 9;
+}
+
+message QuoteCatalogRequest {
+  string transaction_id = 1;
+}
+
+message QuoteCatalogResponseData {
+  string transaction_id = 1;
+  repeated RideQuoteCatalog catalogs = 2;
+}
+
+message QuoteCatalogResponse {
+  consumer.common.commonV2.ResponseMetadata metadata = 1;
+  QuoteCatalogResponseData data = 2;
+}
+
+message RouteInfo {
+  int32 distance_in_meters = 1;
+  int32 time_in_seconds = 2;
+}
+
+message Quote {
+  Fare fare = 1;
+  repeated BreakupItem breakup = 2;
+}
+
+message Fare {
+  string value = 1;
+  Currency currency = 2;
+}
+
+message BreakupItem {
+  string title = 1;
+  Fare price = 2;
+}

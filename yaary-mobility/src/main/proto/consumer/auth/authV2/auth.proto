@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package consumer.auth.authV2;
+option go_package = "github.com/TriffyDigital/yaari-protos/consumer/auth/authV2";
+
+import "consumer/common/commonV2/common.proto";
+
+service AuthService {
+    rpc InitSdk(InitSdkRequest) returns (InitSdkResponse) {}
+    rpc AuthorizeUser(AuthorizeUserRequest) returns (AuthorizeUserRespone) {}
+}
+
+message InitSdkRequest {
+    string client_id = 1;
+    string client_secret = 2;
+    string bundle_id = 3;
+}
+
+message InitSdkResponse {
+    consumer.common.commonV2.ResponseMetadata metadata = 1;
+    InitSdkResponseData data = 2;
+}
+
+message InitSdkResponseData {
+    string api_token = 1;
+}
+
+message AuthorizeUserRequest {
+    string phone_number = 1;
+}
+
+message AuthorizeUserRespone {
+    consumer.common.commonV2.ResponseMetadata metadata = 1;
+    AuthorizeUserResponeData data = 2;
+}
+
+message AuthorizeUserResponeData {
+    string user_session_token = 1;
+}

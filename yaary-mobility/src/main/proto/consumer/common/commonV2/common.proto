@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package consumer.common.commonV2;
+option go_package = "github.com/TriffyDigital/yaari-protos/consumer/common/commonV2";
+
+enum StatusCode {
+    TF_OK = 0;
+    TF_UNAUTH = 1;
+    TF_ERR = 2;
+  }
+
+message ResponseMetadata {
+    StatusCode status_code = 1;
+    string status_message = 2;
+}
