@@ -1,6 +1,7 @@
 package com.yaary.android.mobility
 
 import android.content.Context
+import com.yaary.android.mobility.enviroment.Environment
 import com.yaary.android.mobility.error.Error
 import com.yaary.android.mobility.ride_hailing.RideController
 import com.yaary.android.mobility.utils.InjectorUtil
@@ -13,6 +14,7 @@ class Yaary internal constructor(context: Context, rideController: RideControlle
             clientId: String,
             clientSecret: String,
             bundleId: String,
+            environment: Environment,
             listener: OnSdkInitialiseResultListener
         ) {
             attemptSdkInitialization(
