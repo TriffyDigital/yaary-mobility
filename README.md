@@ -30,7 +30,6 @@ dependencyResolutionManagement {
    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
    repositories {
        maven {
-           name = "GitHubPackages"
            url = uri("https://maven.pkg.github.com/TriffyDigital/yaary-mobility")
        }
    }
