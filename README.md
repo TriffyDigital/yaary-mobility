@@ -68,7 +68,7 @@ Yaary.initialise(
 
 ## User Authentication
 
-After SDK is authorized successfully, before starting the ride booking flow user needs to be authenticated as well, authorize user with their phone number
+After SDK is authentication successfully, before starting the ride booking flow user needs to be authenticated as well with their phone number
 
 ```
 Yaary.authorize(this, "phoneNumber", object : Yaary.OnAuthorizeUserResultListener {
