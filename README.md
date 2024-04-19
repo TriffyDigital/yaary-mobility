@@ -43,7 +43,7 @@ In order for the SDK to function correctly, you need to add some information abo
 
 ```
 Yaary.initialise(
-   applicationContext,
+   context,
    "clientId",
    "clientSecret",
    "bundleId",
@@ -71,7 +71,7 @@ Yaary.initialise(
 After SDK is authentication successfully, before starting the ride booking flow user needs to be authenticated as well with their phone number
 
 ```
-Yaary.authorize(this, "phoneNumber", object : Yaary.OnAuthorizeUserResultListener {
+Yaary.authorize(context, "phoneNumber", object : Yaary.OnAuthorizeUserResultListener {
    override fun onSuccess(instance: Yaary) {
 
 
