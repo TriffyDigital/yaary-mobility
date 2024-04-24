@@ -36,4 +36,5 @@ message AuthorizeUserRespone {
 
 message AuthorizeUserResponeData {
     string user_session_token = 1;
+    string user_id = 2;
 }

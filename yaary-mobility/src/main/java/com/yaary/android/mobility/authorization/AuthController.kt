@@ -4,7 +4,10 @@ import android.content.Context
 import com.yaary.android.mobility.data.AuthRepository
 import com.yaary.android.mobility.data.PreferenceRepository
 import com.yaary.android.mobility.error.Error
+import com.yaary.android.mobility.extentions.isSuccess
 import consumer.auth.authV2.Auth
+import consumer.common.commonV2.Common
+import consumer.common.commonV2.Common.StatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,14 +32,31 @@ internal class AuthController(
             val result = authRepository.initSdk(
                 bundleId, clientId, clientSecret
             )
-            scope.launch(Dispatchers.Main) {
-                //TODO handle errors
-                if (result.isSuccess) {
+            if (result.isSuccess) {
+                if (result.getOrNull()?.metadata?.isSuccess == true) {
                     processInitSdkResponse(result.getOrNull())
                     preferenceRepository.saveClientId(clientId)
-                    onSuccess()
+                    launchInMain {
+                        onSuccess()
+                    }
                 } else {
-                    onFailure(Error(0, ""))
+                    launchInMain {
+                        onFailure(
+                            Error(
+                                StatusCode.UNRECOGNIZED.name,
+                                result.getOrNull()?.metadata?.statusMessage
+                            )
+                        )
+                    }
+                }
+            } else {
+                launchInMain {
+                    onFailure(
+                        Error(
+                            StatusCode.UNRECOGNIZED.name,
+                            result.exceptionOrNull()?.message
+                        )
+                    )
                 }
             }
         }
@@ -55,13 +75,31 @@ internal class AuthController(
     ) {
         scope.launch(Dispatchers.IO) {
             val result = authRepository.authorizeUser(phoneNumber)
-            scope.launch(Dispatchers.Main) {
-                //TODO handle errors
-                if (result.isSuccess) {
+            if (result.isSuccess) {
+                if (result.getOrNull()?.metadata?.isSuccess == true) {
                     processAuthorizeUserRespone(result.getOrNull())
-                    onSuccess()
+                    launchInMain {
+                        onSuccess()
+                    }
                 } else {
-                    onFailure(Error(0, ""))
+                    launchInMain {
+                        onFailure(
+                            Error(
+                                result.getOrNull()?.metadata?.statusCode?.name
+                                    ?: StatusCode.UNRECOGNIZED.name,
+                                result.getOrNull()?.metadata?.statusMessage
+                            )
+                        )
+                    }
+                }
+            } else {
+                launchInMain {
+                    onFailure(
+                        Error(
+                            StatusCode.UNRECOGNIZED.name,
+                            result.exceptionOrNull()?.message
+                        )
+                    )
                 }
             }
         }
@@ -75,5 +113,11 @@ internal class AuthController(
 
     fun removeUser() {
         preferenceRepository.resetData()
+    }
+
+    private fun launchInMain(fn: () -> Unit) {
+        scope.launch(Dispatchers.Main) {
+            fn()
+        }
     }
 }

@@ -7,9 +7,14 @@ enum StatusCode {
     TF_OK = 0;
     TF_UNAUTH = 1;
     TF_ERR = 2;
-  }
+}
 
 message ResponseMetadata {
     StatusCode status_code = 1;
     string status_message = 2;
+}
+
+message LatLng {
+    double lat = 1;
+    double lng = 2;
 }
